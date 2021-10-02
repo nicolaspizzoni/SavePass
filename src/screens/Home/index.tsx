@@ -28,28 +28,40 @@ export function Home() {
   const [searchListData, setSearchListData] = useState<LoginListDataProps>([]);
   const [data, setData] = useState<LoginListDataProps>([]);
 
-  async function loadData() {
+  async function handleFilterLoginData() {
     const dataKey = '@savepass:logins';
-    // Get asyncStorage data, use setSearchListData and setData
-  }
+    const storagedData = await AsyncStorage.getItem(dataKey)
+    const filteredData = data.filter(item => {
+      //strings do item e da busca passadas para lowerCase para uso de insensitive-case na busca
+      const lower = item.service_name.toLowerCase()
+      return lower.includes(searchText.toLowerCase())
+    })
 
-  function handleFilterLoginData() {
-    // Filter results inside data, save with setSearchListData
+    if(searchText && filteredData){
+      setSearchListData(filteredData)
+    }else{
+      if(storagedData){
+        setSearchListData(JSON.parse(storagedData))
+        setData(JSON.parse(storagedData))
+      }
+    }
   }
 
   function handleChangeInputText(text: string) {
-    // Update searchText value
+    setSearchText(text)
   }
 
+  //Adicionado handleFilterLoginData para busca em tempo real conforme searchText muda
   useFocusEffect(useCallback(() => {
-    loadData();
-  }, []));
+    handleFilterLoginData();
+  }, [searchText]));
+
 
   return (
     <>
       <Header
         user={{
-          name: 'Rocketseat',
+          name: 'Nicolas',
           avatar_url: 'https://i.ibb.co/ZmFHZDM/rocketseat.jpg'
         }}
       />
